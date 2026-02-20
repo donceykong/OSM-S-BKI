@@ -4,7 +4,7 @@
 dataset_name: "mcd"
 dataset_root_path: "/media/donceykong/doncey_ssd_02/datasets/MCD"
 sequence: "kth_day_09"
-skip_frames: 10
+skip_frames: 500
 
 # Label definitions: raw_id -> label_name
 labels:

@@ -21,6 +21,9 @@ enum class Category {
 
 struct OSMConfig {
     std::string osm_file;
+    bool use_origin_override = false;
+    double osm_origin_lat = 0.0;
+    double osm_origin_lon = 0.0;
     bool include_buildings = true;
     bool include_roads = true;
     bool include_sidewalks = true;
@@ -38,6 +41,8 @@ struct Polyline2D {
     Category category = Category::Unknown;
 };
 
+// origin_lat and origin_lon are set in the osm config file
+// and are set in loadOSMConfig function
 struct ParsedOSMData {
     double origin_lat = 0.0;
     double origin_lon = 0.0;

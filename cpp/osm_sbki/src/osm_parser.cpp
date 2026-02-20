@@ -45,6 +45,15 @@ bool parseBool(const std::string& v, bool& out) {
     return false;
 }
 
+bool parseDouble(const std::string& v, double& out) {
+    try {
+        out = std::stod(trim(v));
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 std::string stripQuotes(const std::string& s) {
     const std::string t = trim(s);
     if (t.size() >= 2) {
@@ -315,6 +324,21 @@ bool loadOSMConfig(const std::string& config_path, OSMConfig& config, std::strin
     }
     config.osm_file = stripQuotes(kv["osm_file"]);
 
+    auto origin_lat_it = kv.find("osm_origin_lat");
+    auto origin_lon_it = kv.find("osm_origin_lon");
+    if (origin_lat_it != kv.end() || origin_lon_it != kv.end()) {
+        if (origin_lat_it == kv.end() || origin_lon_it == kv.end()) {
+            error_msg = "Both osm_origin_lat and osm_origin_lon must be provided together.";
+            return false;
+        }
+        if (!parseDouble(origin_lat_it->second, config.osm_origin_lat) ||
+            !parseDouble(origin_lon_it->second, config.osm_origin_lon)) {
+            error_msg = "Invalid numeric value for osm_origin_lat/osm_origin_lon.";
+            return false;
+        }
+        config.use_origin_override = true;
+    }
+
     auto parse_flag = [&](const std::string& key, bool& dst) -> bool {
         auto it = kv.find(key);
         if (it == kv.end()) return true;
@@ -339,7 +363,10 @@ bool parsePolylines(const OSMConfig& config, ParsedOSMData& data, std::string& e
     data = ParsedOSMData{};
 
     try {
-        {
+        if (config.use_origin_override) {
+            data.origin_lat = config.osm_origin_lat;
+            data.origin_lon = config.osm_origin_lon;
+        } else {
             osmium::io::Reader reader{osmium::io::File(config.osm_file)};
             OriginEstimator estimator;
             osmium::apply(reader, estimator);
