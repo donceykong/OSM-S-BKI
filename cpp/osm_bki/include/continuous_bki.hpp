@@ -9,6 +9,7 @@
 #ifndef CONTINUOUS_BKI_HPP
 #define CONTINUOUS_BKI_HPP
 
+#include <cstdint>
 #include <vector>
 #include <map>
 #include <unordered_map>

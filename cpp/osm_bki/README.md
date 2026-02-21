@@ -1,6 +1,6 @@
-# osm_sbki (C++)
+# osm_bki (C++)
 
-C++ library and tools for OSM-Enhanced Semantic Bayesian Kernel Inference (OSM-SBKI). Here you will find the static library `osm_sbki_core` and an optional PCL-based visualization example.
+C++ library and tools for OSM-Enhanced Semantic Bayesian Kernel Inference (OSM-SBKI). Here you will find the static library `osm_bki_core` and an optional PCL-based visualization example.
 
 ## Requirements
 
@@ -39,7 +39,7 @@ If libosmium is not found by CMake, set `OSMIUM_INCLUDE_DIR` when configuring (e
 ## Project structure
 
 ```
-osm_sbki/
+osm_bki/
 ├── CMakeLists.txt
 ├── include/           # Public headers
 │   ├── continuous_bki.hpp
@@ -64,7 +64,7 @@ osm_sbki/
 
 ## Build
 
-From the `osm_sbki` directory (where this README and `CMakeLists.txt` live):
+From the `osm_bki` directory (where this README and `CMakeLists.txt` live):
 
 **Library only (default):**
 
@@ -76,14 +76,14 @@ cmake --build build
 **Library + example (`visualize_map_osm`):**
 
 ```bash
-cmake -S . -B build -DOSM_SBKI_BUILD_PCL_EXAMPLES=ON
+cmake -S . -B build -Dosm_bki_BUILD_PCL_EXAMPLES=ON
 cmake --build build
 ```
 
 If libosmium is installed in a non-standard location:
 
 ```bash
-cmake -S . -B build -DOSM_SBKI_BUILD_PCL_EXAMPLES=ON -DOSMIUM_INCLUDE_DIR=/path/to/osmium/include
+cmake -S . -B build -Dosm_bki_BUILD_PCL_EXAMPLES=ON -DOSMIUM_INCLUDE_DIR=/path/to/osmium/include
 cmake --build build
 ```
 
@@ -93,9 +93,9 @@ The example executable is produced at `build/visualize_map_osm`.
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `OSM_SBKI_BUILD_PCL_EXAMPLES` | `OFF` | Build the `visualize_map_osm` example (requires PCL and libosmium). |
+| `osm_bki_BUILD_PCL_EXAMPLES` | `OFF` | Build the `visualize_map_osm` example (requires PCL and libosmium). |
 | `OSMIUM_INCLUDE_DIR` | (empty) | Path to libosmium include directory if not found automatically. |
-| `OSM_SBKI_ENABLE_WARNINGS` | `ON` | Enable compiler warnings. |
+| `osm_bki_ENABLE_WARNINGS` | `ON` | Enable compiler warnings. |
 
 ## Running the example (visualize_map_osm)
 

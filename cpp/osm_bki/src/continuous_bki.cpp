@@ -1,6 +1,7 @@
 #include "continuous_bki.hpp"
 #include "yaml_parser.hpp"
 #include "osm_xml_parser.hpp"
+#include <cstdint>
 #include <fstream>
 #include <limits>
 #include <cstring>
