@@ -2,9 +2,9 @@
 # Configuration for Multi-Class Dataset (MCD) semantic segmentation
 
 dataset_name: "mcd"
-dataset_root_path: "/media/donceykong/doncey_ssd_02/datasets/MCD"
+dataset_root_path: "/home/azureuser/Repos/OSM-BKI/example_data"
 sequence: "kth_day_06"
-skip_frames: 500
+skip_frames: 10 
 
 osm_file: "kth.osm"
 init_latlon_day_06: [59.348268650, 18.073204280]
