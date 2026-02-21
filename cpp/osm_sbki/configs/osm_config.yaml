@@ -1,10 +1,4 @@
 # OSM parser configuration for osm_sbki/examples/visualize_osm.cpp
-
-osm_file: "/media/donceykong/doncey_ssd_02/datasets/MCD/kth.osm"
-
-osm_origin_lat: 59.348268650
-osm_origin_lon: 18.073204280
-
 # Category filters (mirrors BKISemanticMapping osmium filtering intent)
 include_buildings: true
 include_roads: true
@@ -14,4 +8,3 @@ include_fences: true
 include_stairs: true
 include_grasslands: true
 include_trees: true
-

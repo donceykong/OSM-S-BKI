@@ -3,8 +3,12 @@
 
 dataset_name: "mcd"
 dataset_root_path: "/media/donceykong/doncey_ssd_02/datasets/MCD"
-sequence: "kth_day_09"
+sequence: "kth_night_05"
 skip_frames: 500
+
+osm_file: "kth.osm"
+init_latlon_day_06: [59.348268650, 18.073204280]
+init_rel_pos_day_06: [64.3932532565158, 66.4832330946657, 38.5143341050069]
 
 # Label definitions: raw_id -> label_name
 labels:
