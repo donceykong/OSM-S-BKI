@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -24,10 +25,6 @@ struct Color {
     uint8_t g;
     uint8_t b;
 };
-
-// Reference world origin used by plot_points_on_osm_FINAL.py (kth_day_06 first pose).
-const Eigen::Vector3d kInitialPositionKthDay06(
-    64.3932532565158, 66.4832330946657, 38.5143341050069);
 
 Color colorFromLabel(uint32_t label) {
     const uint32_t h = label * 2654435761u;
@@ -124,15 +121,23 @@ int main(int argc, char** argv) {
     const Eigen::Map<const Eigen::Matrix<double, 4, 4, Eigen::RowMajor>> body_to_lidar_mat(body_to_lidar.m.data());
     const Eigen::Matrix4d lidar_to_body = body_to_lidar_mat.inverse();
 
+    Eigen::Vector3d init_rel_pos(0.0, 0.0, 0.0);
+    if (map_config.use_init_rel_pos) {
+        init_rel_pos(0) = map_config.init_rel_pos_x;
+        init_rel_pos(1) = map_config.init_rel_pos_y;
+        init_rel_pos(2) = map_config.init_rel_pos_z;
+    }
+
     std::unordered_map<int, Eigen::Matrix4d> lidar_to_map_by_scan_id;
     lidar_to_map_by_scan_id.reserve(poses.size());
 
     for (const auto& pose : poses) {
         Eigen::Matrix4d body_to_world_rel = poseToMatrix(pose);
-        body_to_world_rel(0, 3) -= kInitialPositionKthDay06(0);
-        body_to_world_rel(1, 3) -= kInitialPositionKthDay06(1);
-        body_to_world_rel(2, 3) -= kInitialPositionKthDay06(2);
-        const Eigen::Matrix4d lidar_to_map = body_to_world_rel * lidar_to_body;
+        body_to_world_rel(0, 3) -= init_rel_pos(0);
+        body_to_world_rel(1, 3) -= init_rel_pos(1);
+        body_to_world_rel(2, 3) -= init_rel_pos(2);
+        Eigen::Matrix4d lidar_to_map = body_to_world_rel * lidar_to_body;
+
         lidar_to_map_by_scan_id[pose.scan_id] = lidar_to_map;
     }
 
@@ -197,6 +202,19 @@ int main(int argc, char** argv) {
         std::cerr << "OSM config error: " << error_msg << std::endl;
         return 1;
     }
+    // Use OSM path and origin from MCD config when present (osm_file is relative to dataset_root_path).
+    if (!map_config.osm_file.empty()) {
+        osm_config.osm_file = (std::filesystem::path(map_config.dataset_root_path) / map_config.osm_file).string();
+    }
+    if (map_config.use_osm_origin_from_mcd) {
+        osm_config.use_origin_override = true;
+        osm_config.osm_origin_lat = map_config.osm_origin_lat;
+        osm_config.osm_origin_lon = map_config.osm_origin_lon;
+    }
+    if (osm_config.osm_file.empty()) {
+        std::cerr << "No OSM file configured: set osm_file in " << mcd_config_path << " or in " << osm_config_path << std::endl;
+        return 1;
+    }
     osm_parser::ParsedOSMData osm_data;
     if (!osm_parser::parsePolylines(osm_config, osm_data, error_msg)) {
         std::cerr << "OSM parse error: " << error_msg << std::endl;
@@ -235,10 +253,9 @@ int main(int argc, char** argv) {
     std::cout << "Map points=" << map_cloud->points.size()
               << ", scans loaded=" << scans_loaded
               << ", scans skipped=" << scans_skipped
-              << ", anchor_sequence=kth_day_06"
-              << ", initial_position_xyz=[" << kInitialPositionKthDay06(0)
-              << "," << kInitialPositionKthDay06(1)
-              << "," << kInitialPositionKthDay06(2) << "]"
+              << ", initial_position_xyz=[" << init_rel_pos(0)
+              << "," << init_rel_pos(1)
+              << "," << init_rel_pos(2) << "]"
               << ", OSM polylines=" << osm_data.polylines.size()
               << ", OSM segments=" << segment_count
               << ", skip_frames=" << skip_frames << std::endl;
