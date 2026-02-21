@@ -48,6 +48,43 @@ bool loadDatasetConfig(const std::string& config_path, DatasetConfig& config, st
         auto skip_it = yaml.scalars.find("skip_frames");
         config.skip_frames = (skip_it != yaml.scalars.end()) ? std::max(0, std::stoi(stripQuotes(skip_it->second))) : 0;
 
+        auto osm_file_it = yaml.scalars.find("osm_file");
+        if (osm_file_it != yaml.scalars.end()) {
+            config.osm_file = stripQuotes(osm_file_it->second);
+        }
+
+        auto init_latlon_it = yaml.scalars.find("init_latlon_day_06");
+        if (init_latlon_it != yaml.scalars.end()) {
+            std::string s = init_latlon_it->second;
+            size_t a = s.find('[');
+            size_t b = s.find(',');
+            size_t c = s.find(']');
+            if (a != std::string::npos && b != std::string::npos && c != std::string::npos) {
+                try {
+                    config.osm_origin_lat = std::stod(s.substr(a + 1, b - a - 1));
+                    config.osm_origin_lon = std::stod(s.substr(b + 1, c - b - 1));
+                    config.use_osm_origin_from_mcd = true;
+                } catch (...) { /* leave use_osm_origin_from_mcd false */ }
+            }
+        }
+
+        auto init_rel_it = yaml.scalars.find("init_rel_pos_day_06");
+        if (init_rel_it != yaml.scalars.end()) {
+            std::string s = init_rel_it->second;
+            size_t a = s.find('[');
+            size_t b = s.find(',');
+            size_t c = s.rfind(',');
+            size_t d = s.find(']');
+            if (a != std::string::npos && b != std::string::npos && c != std::string::npos && d != std::string::npos && c > b) {
+                try {
+                    config.init_rel_pos_x = std::stod(s.substr(a + 1, b - a - 1));
+                    config.init_rel_pos_y = std::stod(s.substr(b + 1, c - b - 1));
+                    config.init_rel_pos_z = std::stod(s.substr(c + 1, d - c - 1));
+                    config.use_init_rel_pos = true;
+                } catch (...) { /* leave use_init_rel_pos false */ }
+            }
+        }
+
         std::string dataset_name_lower = config.dataset_name;
         std::transform(dataset_name_lower.begin(), dataset_name_lower.end(), dataset_name_lower.begin(),
                        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
